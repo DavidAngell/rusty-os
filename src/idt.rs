@@ -1,10 +1,15 @@
-use crate::{println, gdt};
 use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
+use crate::{
+    gdt,
+    println, io::{keyboard::keyboard_interrupt_handler, pic::{InterruptIndex, timer_interrupt_handler}},
+};
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
+
+        // Exceptions
         // idt.breakpoint.set_handler_fn(breakpoint_handler);
         idt.divide_error.set_handler_fn(divide_error_handler);
         idt.debug.set_handler_fn(debug_handler);
@@ -34,6 +39,11 @@ lazy_static! {
         idt.security_exception.set_handler_fn(security_exception_handler);
         // idt.reserved_3.set_handler_fn(reserved_3_handler);
         // idt.interrupts.set_handler_fn(interrupts_handler);
+
+        // PIC interrupts
+        idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
+        idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
+
         idt
     };
 }
@@ -74,7 +84,10 @@ extern "x86-interrupt" fn device_not_available_handler(stack_frame: InterruptSta
     println!("EXCEPTION: DEVICE NOT AVAILABLE\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) -> ! {
+extern "x86-interrupt" fn double_fault_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) -> ! {
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
 
@@ -86,19 +99,31 @@ extern "x86-interrupt" fn invalid_tss_handler(stack_frame: InterruptStackFrame, 
     println!("EXCEPTION: INVALID TSS\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn segment_not_present_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn segment_not_present_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: SEGMENT NOT PRESENT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn stack_segment_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn stack_segment_fault_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: STACK SEGMENT FAULT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn general_protection_fault_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn general_protection_fault_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: GENERAL PROTECTION FAULT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn page_fault_handler(stack_frame: InterruptStackFrame, _error_code: PageFaultErrorCode) {
+extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: PageFaultErrorCode,
+) {
     println!("EXCEPTION: PAGE FAULT\n{:#?}", stack_frame);
 }
 
@@ -110,7 +135,10 @@ extern "x86-interrupt" fn x87_floating_point_handler(stack_frame: InterruptStack
     println!("EXCEPTION: X87 FLOATING POINT\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn alignment_check_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn alignment_check_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: ALIGNMENT CHECK\n{:#?}", stack_frame);
 }
 
@@ -126,7 +154,10 @@ extern "x86-interrupt" fn virtualization_handler(stack_frame: InterruptStackFram
     println!("EXCEPTION: VIRTUALIZATION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn cp_protection_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn cp_protection_exception_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: CP PROTECTION EXCEPTION\n{:#?}", stack_frame);
 }
 
@@ -138,11 +169,17 @@ extern "x86-interrupt" fn hv_injection_exception_handler(stack_frame: InterruptS
     println!("EXCEPTION: HV INJECTION EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn vmm_communication_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn vmm_communication_exception_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: VMM COMMUNICATION EXCEPTION\n{:#?}", stack_frame);
 }
 
-extern "x86-interrupt" fn security_exception_handler(stack_frame: InterruptStackFrame, _error_code: u64) {
+extern "x86-interrupt" fn security_exception_handler(
+    stack_frame: InterruptStackFrame,
+    _error_code: u64,
+) {
     println!("EXCEPTION: SECURITY EXCEPTION\n{:#?}", stack_frame);
 }
 
