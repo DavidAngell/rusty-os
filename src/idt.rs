@@ -1,4 +1,4 @@
-use crate::println;
+use crate::{println, gdt};
 use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
@@ -14,7 +14,7 @@ lazy_static! {
         idt.bound_range_exceeded.set_handler_fn(bound_range_exceeded_handler);
         idt.invalid_opcode.set_handler_fn(invalid_opcode_handler);
         idt.device_not_available.set_handler_fn(device_not_available_handler);
-        idt.double_fault.set_handler_fn(double_fault_handler);
+        unsafe { idt.double_fault.set_handler_fn(double_fault_handler).set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX) };
         // idt.coprocessor_segment_overrun.set_handler_fn(coprocessor_segment_overrun_handler);
         idt.invalid_tss.set_handler_fn(invalid_tss_handler);
         idt.segment_not_present.set_handler_fn(segment_not_present_handler);
@@ -38,7 +38,7 @@ lazy_static! {
     };
 }
 
-pub fn init_idt() {
+pub fn init() {
     IDT.load();
 }
 

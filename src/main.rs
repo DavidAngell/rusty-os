@@ -5,14 +5,19 @@ use core::panic::PanicInfo;
 
 use rusty_os::*;
 
+fn stack_overflow() {
+    stack_overflow(); // for each recursion, the return address is pushed
+}
+
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    
     println!("Hello World{}", "!");
-    println!("Hello World{}", "!");
-    println!("Hello World{}", "!");
-    println!("Hello World{}", "!");
-    panic!("Some panic message");
+
+    rusty_os::init();
+
+    stack_overflow();
+
+    // stack_overflow();
 
     loop {}
 }
