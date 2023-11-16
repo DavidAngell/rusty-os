@@ -2,7 +2,8 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-mod vga_buffer;
+
+use rusty_os::*;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
