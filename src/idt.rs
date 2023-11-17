@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 use crate::{
     gdt,
-    println, io::{keyboard::keyboard_interrupt_handler, pic::{InterruptIndex, timer_interrupt_handler}},
+    println, pic::{InterruptIndex, timer::timer_interrupt_handler, keyboard::keyboard_interrupt_handler},
 };
 
 lazy_static! {

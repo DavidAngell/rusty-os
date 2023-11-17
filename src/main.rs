@@ -2,13 +2,11 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-use rusty_os::{*, programs::shell};
+use rusty_os::{*};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     rusty_os::init();
-    
-    shell::run();
 
     // halt the CPU
     hlt_loop();

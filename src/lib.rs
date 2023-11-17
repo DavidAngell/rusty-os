@@ -6,7 +6,7 @@
 pub mod vga;
 pub mod idt;
 pub mod gdt;
-pub mod io;
+pub mod pic;
 pub mod print;
 pub mod programs;
 
@@ -18,7 +18,7 @@ pub fn init() {
     idt::init();
 
     // Initialize the PIC
-    unsafe { io::pic::PICS.lock().initialize() };
+    unsafe { pic::PICS.lock().initialize() };
     x86_64::instructions::interrupts::enable(); 
 }
 
